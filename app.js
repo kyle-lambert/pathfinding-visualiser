@@ -1,248 +1,180 @@
-const rows = 5;
-const cols = 5;
-const grid = new Array(rows);
+// import dijkstraAlgorithm from './algorithms/dijkstra.js'
 
-setup();
+// function setupGraph(cols, rows) {
+//   const graph = new Array(cols);
 
-function setup() {
-  function Node(row, col) {
-    this.col = col;
-    this.row = row;
-    this.distance = Infinity;
-    this.isVisited = false;
-    this.isStart = col === 0 && row === 2;
-    this.isEnd = col === 4 && row === 2;
+//   function Node(col, row) {
+//     this.col = col;
+//     this.row = row;
+//     this.distance = Infinity;
+//     this.isVisited = false;
+//   }
+//   for (let i = 0; i < rows; i++) {
+//     graph[i] = new Array(cols);
+//   }
+
+//   for (let i = 0; i < rows; i++) {
+//     for (let j = 0; j < cols; j++) {
+//       graph[i][j] = new Node(i, j);
+//     }
+//   }
+//   return graph;
+// };
+
+
+// function renderGraph(cols, rows) {
+//   for (let i = 0; i < cols; i++) {
+//     for (let j = 0; j < rows; j++) {
+//       let node = `<div class='node' data-col=${i} data-row=${j} ></div>`;
+//       document.getElementById('graph').insertAdjacentHTML('beforeend', node);
+//     }
+//   }
+// }
+
+// function removeIsStart(graph) {
+//   graph.forEach(col => {
+//     col.forEach(node => {
+//       if (node.isStart) delete node.isStart;
+//     })
+//   })
+// }
+
+// function removeStartClass(elements) {
+//   elements.forEach(el => el.classList.remove('node--start'));
+// }
+
+// function controller() {
+//   const COLS_NUM = 5;
+//   const ROWS_NUM = 5;
+//   let startNode;
+
+//   // Setup 2D grid
+//   const graph = setupGraph(COLS_NUM, ROWS_NUM);
+
+//   // Render nodes to UI
+//   renderGraph(COLS_NUM, ROWS_NUM);
+
+//   // Add events to all screen nodes
+//   const elements = document.querySelectorAll('.node');
+
+//   elements.forEach(el => {
+//     el.addEventListener('click', (e) => {
+//       const col = parseInt(e.target.dataset.col);
+//       const row = parseInt(e.target.dataset.row);
+//       removeStartClass(elements);
+//       removeIsStart(graph);
+
+//       el.classList.add('node--start');
+//       graph[col][row].isStart = true;
+//       startNode = graph[col][row];
+
+//       console.log(startNode);
+//     })
+//   })
+
+//   const dijkstraButton = document.getElementById('dijkstraBtn');
+
+// }
+
+// controller();
+
+
+
+
+
+
+
+
+/// WORKING BELOW
+
+// const ROW_NUM = 5;
+// const COL_NUM = 10
+
+
+// function setup(rows, cols) {
+//   const graph = new Array(rows);
+
+//   function Node(row, col) {
+//     this.row = row;
+//     this.col = col;
+//     this.distance = Infinity;
+//     this.isVisited = false;
+//   }
+
+//   for (let i = 0; i < rows; i++) {
+//     graph[i] = new Array(cols);
+//   }
+
+//   for (let i = 0; i < rows; i++) {
+//     for (let j = 0; j < cols; j++) {
+//       graph[i][j] = new Node(i, j);
+//     }
+//   }
+
+//   for (let i = 0; i < rows; i++) {
+//     for (let j = 0; j < cols; j++) {
+//       let node = `<div class='node' data-row=${i} data-col=${j} ></div>`;
+//       document.getElementById('graph').insertAdjacentHTML('beforeend', node);
+//     }
+//   }
+//   console.log(graph);
+//   return graph
+// }
+
+class Model {
+  constructor(rows, cols) {
+    this.rows = rows;
+    this.cols = cols;
   }
 
-  for (let i = 0; i < rows; i++) {
-    grid[i] = new Array(cols);
-  }
+  initialise() {
+    const graph = new Array(this.rows);
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      grid[i][j] = new Node(i, j);
+    function Node(row, col) {
+      this.row = row;
+      this.col = col;
+      this.distance = Infinity;
+      this.isVisited = false;
     }
-  }
 
-  function displayGrid(grid) {
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        let element = `<div class='node' data-node='${i}${j}'></div>`;
-        if (grid[i][j].isStart) element = `<div class='node node--start' data-node='${i}${j}'></div>`;
-        if (grid[i][j].isEnd) element = `<div class='node node--end' data-node='${i}${j}'></div>`;
-        document.getElementById('grid').insertAdjacentHTML('beforeend', element);
+    for (let i = 0; i < this.rows; i++) {
+      graph[i] = new Array(this.cols);
+    }
+
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        graph[i][j] = new Node(i, j);
       }
     }
-  }
-  displayGrid(grid);
-}
 
-function dijkstra(grid) {
-  const visitedNodesInOrder = [];
-  let unvistedNodes = getAllNodes(grid);
-  let startNode = unvistedNodes.filter(n => n.isStart);
-
-  startNode[0].distance = 0;
-
-  while (unvistedNodes.length > 0) {
-    sortNodesByDistance(unvistedNodes);
-    const closestNode = unvistedNodes.shift();
-    closestNode.isVisited = true;
-    visitedNodesInOrder.push(closestNode);
-    updateUnvisitedNeighbors(closestNode, grid);
-  }
-
-  // console.log(visitedNodesInOrder);
-  const UInodes = document.querySelectorAll('.node');
-
-  for (let i = 0; i < visitedNodesInOrder.length; i++) {
-    const UIcord = [(parseInt(UInodes[i].dataset.node[0])), (parseInt(UInodes[i].dataset.node[1]))];
-    const cord = [visitedNodesInOrder[i].row, visitedNodesInOrder[i].col]
-
-    if (UIcord === cord) {
-      console.log(UInodes[i]);
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        let node = `<div class='node' data-row=${i} data-col=${j} ></div>`;
+        document.getElementById('graph').insertAdjacentHTML('beforeend', node);
+      }
     }
-  }
-
-}
-
-
-
-
-
-dijkstra(grid);
-
-function updateUnvisitedNeighbors(node, grid) {
-  const unvisitedNeighbors = getUnvisitedNeighbors(node, grid);
-  for (const neighbor of unvisitedNeighbors) {
-    neighbor.distance = node.distance + 1;
-    neighbor.previousNode = node;
+    this.graph = graph;
   }
 }
 
-function getUnvisitedNeighbors(node, grid) {
-  const neighbors = [];
-  const {
-    col,
-    row
-  } = node;
-  if (row > 0) neighbors.push(grid[row - 1][col]);
-  if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
-  if (col > 0) neighbors.push(grid[row][col - 1]);
-  if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
-  return neighbors.filter(neighbor => !neighbor.isVisited);
-}
+class View {
+  constructor() {
 
-function sortNodesByDistance(unvistedNodes) {
-  unvistedNodes.sort((a, b) => a.distance - b.distance);
-}
-
-function getAllNodes(grid) {
-  const nodes = [];
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j++) {
-      nodes.push(grid[i][j]);
-    }
   }
-  return nodes;
 }
 
+function controller() {
+  const ROW_NUM = 5;
+  const COL_NUM = 10;
 
+  const model = new Model(ROW_NUM, COL_NUM);
 
+  model.initialise();
+  const graph = model.graph;
 
+  console.log(graph);
+}
 
+controller();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const grid = [];
-
-// for (let row = 1; row <= 20; row++) {
-//   let currentRow = [];
-//   for (let col = 1; col <= 20; col++) {
-//     let currentNode = {
-//       row,
-//       col,
-//       isVisited: false,
-//       isInitial: row === 10 && col === 1,
-//       distance: row === 10 && col === 1 ? 0 : Infinity
-//     }
-//     currentRow.push(currentNode);
-//   }
-//   grid.push(currentRow);
-// }
-
-// class Dijkstra {
-//   constructor(grid) {
-//     this.grid = grid;
-//     this.unvistedSet = [];
-//     this.initialNode;
-//   }
-
-//   getUnvisitedSet() {
-//     this.grid.forEach(row => {
-//       row.forEach(node => {
-//         this.unvistedSet.push(node);
-//       })
-//     })
-//   }
-
-//   getInitialNode() {
-//     const initial = this.unvistedSet.filter(node => node.isInitial);
-//     this.initialNode = initial;
-//   }
-// }
-
-// const runDijkstra = function () {
-//   const dijkstra = new Dijkstra(grid);
-
-//   let unvistedSet = dijkstra.getUnvisitedSet();
-//   let initialNode = dijkstra.getInitialNode();
-//   let currentNode = initialNode;
-
-//   console.log(dijkstra);
-// }
-
-// runDijkstra();
-
-
-
-
-
-
-// const displayNodes = function (nodes) {
-//   nodes.forEach(node => {
-//     let currentNode = `<div class='node'></div>`
-//     if (node.isStartNode) {
-//       currentNode = `<div class='node node--start'></div>`;
-//     }
-//     if (node.isEndNode) {
-//       currentNode = `<div class='node node--end'></div>`;
-//     }
-//     document.getElementById('grid').insertAdjacentHTML('beforeend', currentNode);
-//   })
-// }
-// displayNodes(fullNodesArray);
-
-
-
-
-// const getStartNode = function (nodes) {
-//   let startNode;
-//   nodes.forEach(node => {
-//     return node.isStartNode ? startNode = node : null
-//   });
-//   return startNode;
-// }
-// console.log(fullNodesArray);
-// console.log(getStartNode(fullNodesArray))
-
-// const getEndNode = function (nodes) {
-//   let endNode;
-//   nodes.forEach(row => {
-//     row.forEach(node => {
-//       if (node.isEndNode) {
-//         endNode = node;
-//       }
-//     })
-//   })
-//   return endNode;
-// }
-
-// const startNode = getStartNode(nodesArray);
-// const endNode = getEndNode(nodesArray);
-
-// console.log(startNode);
-// console.log(endNode);
-
-
-
-
-
-// const dijkstra = function (nodes, start, end) {
-//   start.distance = 0;
-//   console.log(start);
-
-//   console.log(nodes.sort());
-// }
-
-// dijkstra(nodesArray, startNode, endNode);
-
-// document.querySelectorAll('.node').forEach(node => {
-//   node.addEventListener('click', (e) => {
-//     const startNode = e.target;
-
-//     console.log(startNode);
-//     startNode.classList.add('node--start');
-//   })
-// })
+// setup(ROW_NUM, COL_NUM);
