@@ -1,180 +1,117 @@
-// import dijkstraAlgorithm from './algorithms/dijkstra.js'
-
-// function setupGraph(cols, rows) {
-//   const graph = new Array(cols);
-
-//   function Node(col, row) {
-//     this.col = col;
-//     this.row = row;
-//     this.distance = Infinity;
-//     this.isVisited = false;
-//   }
-//   for (let i = 0; i < rows; i++) {
-//     graph[i] = new Array(cols);
-//   }
-
-//   for (let i = 0; i < rows; i++) {
-//     for (let j = 0; j < cols; j++) {
-//       graph[i][j] = new Node(i, j);
-//     }
-//   }
-//   return graph;
-// };
-
-
-// function renderGraph(cols, rows) {
-//   for (let i = 0; i < cols; i++) {
-//     for (let j = 0; j < rows; j++) {
-//       let node = `<div class='node' data-col=${i} data-row=${j} ></div>`;
-//       document.getElementById('graph').insertAdjacentHTML('beforeend', node);
-//     }
-//   }
-// }
-
-// function removeIsStart(graph) {
-//   graph.forEach(col => {
-//     col.forEach(node => {
-//       if (node.isStart) delete node.isStart;
-//     })
-//   })
-// }
-
-// function removeStartClass(elements) {
-//   elements.forEach(el => el.classList.remove('node--start'));
-// }
-
-// function controller() {
-//   const COLS_NUM = 5;
-//   const ROWS_NUM = 5;
-//   let startNode;
-
-//   // Setup 2D grid
-//   const graph = setupGraph(COLS_NUM, ROWS_NUM);
-
-//   // Render nodes to UI
-//   renderGraph(COLS_NUM, ROWS_NUM);
-
-//   // Add events to all screen nodes
-//   const elements = document.querySelectorAll('.node');
-
-//   elements.forEach(el => {
-//     el.addEventListener('click', (e) => {
-//       const col = parseInt(e.target.dataset.col);
-//       const row = parseInt(e.target.dataset.row);
-//       removeStartClass(elements);
-//       removeIsStart(graph);
-
-//       el.classList.add('node--start');
-//       graph[col][row].isStart = true;
-//       startNode = graph[col][row];
-
-//       console.log(startNode);
-//     })
-//   })
-
-//   const dijkstraButton = document.getElementById('dijkstraBtn');
-
-// }
-
-// controller();
-
-
-
-
-
-
-
-
-/// WORKING BELOW
-
-// const ROW_NUM = 5;
-// const COL_NUM = 10
-
-
-// function setup(rows, cols) {
-//   const graph = new Array(rows);
-
-//   function Node(row, col) {
-//     this.row = row;
-//     this.col = col;
-//     this.distance = Infinity;
-//     this.isVisited = false;
-//   }
-
-//   for (let i = 0; i < rows; i++) {
-//     graph[i] = new Array(cols);
-//   }
-
-//   for (let i = 0; i < rows; i++) {
-//     for (let j = 0; j < cols; j++) {
-//       graph[i][j] = new Node(i, j);
-//     }
-//   }
-
-//   for (let i = 0; i < rows; i++) {
-//     for (let j = 0; j < cols; j++) {
-//       let node = `<div class='node' data-row=${i} data-col=${j} ></div>`;
-//       document.getElementById('graph').insertAdjacentHTML('beforeend', node);
-//     }
-//   }
-//   console.log(graph);
-//   return graph
-// }
-
-class Model {
-  constructor(rows, cols) {
-    this.rows = rows;
-    this.cols = cols;
+const graphController = (function () {
+  let data = {
+    rows: 5,
+    cols: 10
   }
 
-  initialise() {
-    const graph = new Array(this.rows);
+  const Node = function (row, col) {
+    this.row = row;
+    this.col = col;
+    this.distance = Infinity;
+    this.isVisited = false;
+    this.isStart = false;
+    this.isEnd = false;
+    this.id = `${row}${col}`
+  }
 
-    function Node(row, col) {
-      this.row = row;
-      this.col = col;
-      this.distance = Infinity;
-      this.isVisited = false;
+  const getGraph = function (rows, cols) {
+    const graph = new Array(rows);
+
+    for (let i = 0; i < rows; i++) {
+      graph[i] = new Array(cols);
     }
 
-    for (let i = 0; i < this.rows; i++) {
-      graph[i] = new Array(this.cols);
-    }
-
-    for (let i = 0; i < this.rows; i++) {
-      for (let j = 0; j < this.cols; j++) {
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
         graph[i][j] = new Node(i, j);
       }
     }
+    return graph;
+  }
 
-    for (let i = 0; i < this.rows; i++) {
-      for (let j = 0; j < this.cols; j++) {
-        let node = `<div class='node' data-row=${i} data-col=${j} ></div>`;
-        document.getElementById('graph').insertAdjacentHTML('beforeend', node);
+  const filterById = function (id) {
+    const graph = getGraph(data.rows, data.cols)
+    for (let i = 0; i < data.rows; i++) {
+      for (let j = 0; j < data.cols; j++) {
+        if (graph[i][j].id === id) return graph[i][j];
       }
     }
-    this.graph = graph;
   }
-}
 
-class View {
-  constructor() {
-
+  return {
+    getData: function () {
+      return {
+        rows: data.rows,
+        cols: data.cols,
+        graph: getGraph(data.rows, data.cols)
+      }
+    },
+    getNode: function (id) {
+      return filterById(id);
+    },
   }
-}
+})();
 
-function controller() {
-  const ROW_NUM = 5;
-  const COL_NUM = 10;
+const viewController = (function () {
+  const elements = {
+    container: document.getElementById('graph')
+  }
 
-  const model = new Model(ROW_NUM, COL_NUM);
+  const clearContainer = function () {
+    elements.container.innerHTML = '';
+  }
 
-  model.initialise();
-  const graph = model.graph;
+  return {
+    displayGraph: function (rows, cols, graph) {
+      clearContainer();
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          let node = `<div class='node' id=${i}${j} data-row=${i} data-col=${j} ></div>`;
+          if (graph[i][j].isStart) {
+            node = `<div class='node node--start' id=${i}${j} data-row=${i} data-col=${j} ></div>`;
+          }
+          if (graph[i][j].isEnd) {
+            node = `<div class='node node--end' id=${i}${j} data-row=${i} data-col=${j} ></div>`;
+          }
+          elements.container.insertAdjacentHTML('beforeend', node);
+        }
+      }
+    },
+    getElements: function () {
+      return elements;
+    }
+  }
+})();
 
-  console.log(graph);
-}
+const controller = (function (graphCtrl, viewCtrl) {
+  const {
+    rows,
+    cols,
+    graph
+  } = graphCtrl.getData();
 
-controller();
+  const setupEventListeners = function () {
+    const elements = viewCtrl.getElements();
 
-// setup(ROW_NUM, COL_NUM);
+    elements.container.addEventListener('click', (e) => {
+      const isNode = e.target.className.includes('node');
+
+      if (isNode) {
+        const id = e.target.id;
+        const node = graphCtrl.getNode(id);
+        console.log(node)
+      }
+    })
+  }
+
+  return {
+    init: function () {
+
+      viewCtrl.displayGraph(rows, cols, graph);
+
+      setupEventListeners();
+    }
+  }
+
+})(graphController, viewController);
+controller.init();
