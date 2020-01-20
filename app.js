@@ -29,83 +29,80 @@ const graphController = (function () {
     return graph;
   }
 
-  const filterById = function (id) {
-    const graph = getGraph(data.rows, data.cols)
+  const updateIsStart = function (node, graph) {
     for (let i = 0; i < data.rows; i++) {
       for (let j = 0; j < data.cols; j++) {
-        if (graph[i][j].id === id) return graph[i][j];
+        graph[i][j].isStart = false;
       }
     }
+    node.isStart = true;
   }
 
+
   return {
-    getData: function () {
-      return {
-        rows: data.rows,
-        cols: data.cols,
-        graph: getGraph(data.rows, data.cols)
+    data: {
+      rows: data.rows,
+      cols: data.cols,
+      graph: getGraph(data.rows, data.cols)
+    },
+    getNodeById: function (id, graph) {
+      for (let i = 0; i < data.rows; i++) {
+        for (let j = 0; j < data.cols; j++) {
+          if (graph[i][j].id === id) return graph[i][j];
+        }
       }
     },
-    getNode: function (id) {
-      return filterById(id);
-    },
+    updateNodeIsStart: updateIsStart
   }
 })();
 
 const viewController = (function () {
-  const elements = {
+  const DOM = {
     container: document.getElementById('graph')
-  }
-
-  const clearContainer = function () {
-    elements.container.innerHTML = '';
   }
 
   return {
     displayGraph: function (rows, cols, graph) {
-      clearContainer();
       for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
-          let node = `<div class='node' id=${i}${j} data-row=${i} data-col=${j} ></div>`;
-          if (graph[i][j].isStart) {
-            node = `<div class='node node--start' id=${i}${j} data-row=${i} data-col=${j} ></div>`;
-          }
-          if (graph[i][j].isEnd) {
-            node = `<div class='node node--end' id=${i}${j} data-row=${i} data-col=${j} ></div>`;
-          }
-          elements.container.insertAdjacentHTML('beforeend', node);
+          let cell = `<div class='node' id=${i}${j} data-row=${i} data-col=${j} ></div>`;
+          DOM.container.insertAdjacentHTML('beforeend', cell);
         }
       }
     },
-    getElements: function () {
-      return elements;
-    }
+    DOM: DOM
   }
 })();
 
 const controller = (function (graphCtrl, viewCtrl) {
-  const {
-    rows,
-    cols,
-    graph
-  } = graphCtrl.getData();
-
   const setupEventListeners = function () {
-    const elements = viewCtrl.getElements();
 
-    elements.container.addEventListener('click', (e) => {
+    viewCtrl.DOM.container.addEventListener('click', (e) => {
       const isNode = e.target.className.includes('node');
+      const cell = e.target;
 
       if (isNode) {
         const id = e.target.id;
-        const node = graphCtrl.getNode(id);
-        console.log(node)
+        const node = graphCtrl.getNodeById(id, graphCtrl.data.graph);
+
+        graphCtrl.updateNodeIsStart(node, graphCtrl.data.graph);
+
+        viewCtrl.DOM.container.querySelectorAll('.node').forEach(cell => {
+          cell.classList.remove('node--start');
+        });
+
+        cell.classList.add('node--start');
       }
     })
   }
 
   return {
     init: function () {
+      const {
+        rows,
+        cols,
+        graph
+      } = graphCtrl.data;
 
       viewCtrl.displayGraph(rows, cols, graph);
 
