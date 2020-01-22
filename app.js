@@ -1,27 +1,25 @@
+const Node = function (row, col) {
+  this.row = row;
+  this.col = col;
+  this.distance = Infinity;
+  this.isVisited = false;
+  this.isStart = false;
+  this.isEnd = false;
+  this.id = `${row}${col}`
+}
+
 const graphController = (function () {
   let data = {
     rows: 5,
-    cols: 10
+    cols: 10,
   }
 
-  const Node = function (row, col) {
-    this.row = row;
-    this.col = col;
-    this.distance = Infinity;
-    this.isVisited = false;
-    this.isStart = false;
-    this.isEnd = false;
-    this.id = `${row}${col}`
-  }
 
-  const getGraph = function (rows, cols) {
+  const build2dArray = function (rows, cols) {
     const graph = new Array(rows);
 
     for (let i = 0; i < rows; i++) {
       graph[i] = new Array(cols);
-    }
-
-    for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         graph[i][j] = new Node(i, j);
       }
@@ -29,85 +27,83 @@ const graphController = (function () {
     return graph;
   }
 
-  const updateIsStart = function (node, graph) {
-    for (let i = 0; i < data.rows; i++) {
-      for (let j = 0; j < data.cols; j++) {
-        graph[i][j].isStart = false;
-      }
-    }
-    node.isStart = true;
+  const flatten2dArray = function (graph) {
+    return graph.reduce((acc, cur) => acc.concat(cur));
   }
 
+  const defaultStartProp = function (graph) {
+    return flatten2dArray(graph).forEach(cur => cur.isStart = false);
+  }
+
+  const filterById = function (id, graph) {
+    return flatten2dArray(graph).filter(cur => cur.id === id);
+  }
 
   return {
     data: {
       rows: data.rows,
       cols: data.cols,
-      graph: getGraph(data.rows, data.cols)
+      graph: build2dArray(data.rows, data.cols)
     },
-    getNodeById: function (id, graph) {
-      for (let i = 0; i < data.rows; i++) {
-        for (let j = 0; j < data.cols; j++) {
-          if (graph[i][j].id === id) return graph[i][j];
-        }
-      }
-    },
-    updateNodeIsStart: updateIsStart
+    filterById: filterById,
+    defaultStartProp: defaultStartProp
+
   }
 })();
 
 const viewController = (function () {
-  const DOM = {
-    container: document.getElementById('graph')
+  const DOMstrings = {
+    graphWrapper: 'graph',
+    startButton: 'startButton',
+    cell: '.cell'
   }
 
-  return {
-    displayGraph: function (rows, cols, graph) {
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          let cell = `<div class='node' id=${i}${j} data-row=${i} data-col=${j} ></div>`;
-          DOM.container.insertAdjacentHTML('beforeend', cell);
-        }
+  const renderCells = function (rows, cols) {
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        let cell = `<div class='cell' id=${i}${j} data-row=${i} data-col=${j} ></div>`;
+        document.getElementById(DOMstrings.graphWrapper).insertAdjacentHTML('beforeend', cell);
       }
-    },
-    DOM: DOM
+    }
+  }
+  return {
+    render: renderCells,
+    DOM: DOMstrings
   }
 })();
 
 const controller = (function (graphCtrl, viewCtrl) {
+  const init = function () {
+    viewCtrl.render(graphCtrl.data.rows, graphCtrl.data.cols);
+    setupEventListeners();
+  }
+
   const setupEventListeners = function () {
+    document.querySelectorAll('.cell').forEach(cell => {
+      cell.addEventListener('click', updateStartNode)
+    });
 
-    viewCtrl.DOM.container.addEventListener('click', (e) => {
-      const isNode = e.target.className.includes('node');
-      const cell = e.target;
+  }
 
-      if (isNode) {
-        const id = e.target.id;
-        const node = graphCtrl.getNodeById(id, graphCtrl.data.graph);
+  const updateStartNode = function (e) {
+    const cell = e.target
+    const id = cell.id;
+    const gNode = graphCtrl.filterById(id, graphCtrl.data.graph);
 
-        graphCtrl.updateNodeIsStart(node, graphCtrl.data.graph);
-
-        viewCtrl.DOM.container.querySelectorAll('.node').forEach(cell => {
-          cell.classList.remove('node--start');
-        });
-
-        cell.classList.add('node--start');
-      }
+    // default all start props back to false
+    graphCtrl.defaultStartProp(graphCtrl.data.graph);
+    // update start node property
+    gNode.isStart = true;
+    // remove start styles from every  cell
+    document.querySelectorAll('.cell').forEach(cell => {
+      cell.classList.remove('cell--start');
     })
+    // add styles to current start cell
+    cell.classList.add('cell--start');
   }
 
   return {
-    init: function () {
-      const {
-        rows,
-        cols,
-        graph
-      } = graphCtrl.data;
-
-      viewCtrl.displayGraph(rows, cols, graph);
-
-      setupEventListeners();
-    }
+    init: init
   }
 
 })(graphController, viewController);
