@@ -1,56 +1,58 @@
-export default function dijkstra(graph, start) {
-  const startNode = start;
-
-  if (!graph) alert('Graph is empty');
-  if (!startNode) alert('No start node');
+export const dijkstra = function (allNodes, startNode, endNode) {
+  const unvisitedNodes = flattenAllNodes(allNodes);
 
   const visitedNodesInOrder = [];
-  let unvistedNodes = getAllNodes(graph);
+  startNode.dist = 0;
 
-  startNode.distance = 0;
-
-  while (unvistedNodes.length > 0) {
-    sortNodesByDistance(unvistedNodes);
-    const closestNode = unvistedNodes.shift();
-    closestNode.isVisited = true;
+  while (unvisitedNodes.length > 0) {
+    sortNodesByDistance(unvisitedNodes);
+    const closestNode = unvisitedNodes.shift();
+    if (closestNode === endNode) return visitedNodesInOrder
+    updateUnvisitedNeighbors(closestNode, allNodes);
+    closestNode.isVisited = true
     visitedNodesInOrder.push(closestNode);
-    updateUnvisitedNeighbors(closestNode, graph);
   }
-  // console.log(visitedNodesInOrder);
   return visitedNodesInOrder;
 }
 
-function updateUnvisitedNeighbors(node, graph) {
-  const unvisitedNeighbors = getUnvisitedNeighbors(node, graph);
-  for (const neighbor of unvisitedNeighbors) {
-    neighbor.distance = node.distance + 1;
-    neighbor.previousNode = node;
-  }
+function updateUnvisitedNeighbors(closestNode, allNodes) {
+  const unvisitedNeighbors = getUnvisitedNeighbors(closestNode, allNodes);
+  unvisitedNeighbors.forEach(neighbor => {
+    neighbor.dist = closestNode.dist + 1
+    neighbor.previousNode = closestNode;
+  })
 }
 
-function getUnvisitedNeighbors(node, graph) {
+function getUnvisitedNeighbors(closestNode, allNodes) {
   const neighbors = [];
   const {
-    col,
-    row
-  } = node;
-  if (row > 0) neighbors.push(graph[row - 1][col]);
-  if (row < graph.length - 1) neighbors.push(graph[row + 1][col]);
-  if (col > 0) neighbors.push(graph[row][col - 1]);
-  if (col < graph[0].length - 1) neighbors.push(graph[row][col + 1]);
-  return neighbors.filter(neighbor => !neighbor.isVisited);
+    row,
+    col
+  } = closestNode;
+
+  if (row > 0) neighbors.push(allNodes[row - 1][col]);
+  if (row < allNodes.length - 1) neighbors.push(allNodes[row + 1][col])
+  if (col > 0) neighbors.push(allNodes[row][col - 1]);
+  if (col < allNodes[0].length - 1) neighbors.push(allNodes[row][col + 1])
+
+  return neighbors.filter(n => !n.isVisited);
 }
 
-function sortNodesByDistance(unvistedNodes) {
-  unvistedNodes.sort((a, b) => a.distance - b.distance);
+function sortNodesByDistance(unvisitedNodes) {
+  unvisitedNodes.sort((a, b) => a.dist - b.dist);
 }
 
-function getAllNodes(graph) {
-  const nodes = [];
-  graph.forEach(col => {
-    col.forEach(node => {
-      nodes.push(node);
-    });
-  })
-  return nodes;
+const flattenAllNodes = function (allNodes) {
+  return allNodes.reduce((acc, cur) => acc.concat(cur));
+}
+
+export function getNodesInShortestPath(endNode) {
+  const nodesInShortestPathOrder = [];
+  let currentNode = endNode;
+
+  while (currentNode) {
+    nodesInShortestPathOrder.push(currentNode);
+    currentNode = currentNode.previousNode;
+  }
+  return nodesInShortestPathOrder;
 }
