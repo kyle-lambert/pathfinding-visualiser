@@ -1,9 +1,9 @@
 const Node = function (row, col) {
   this.row = row;
   this.col = col;
-  this.id = `${row}${col}`;
-  this.isStart = (row === 4 && col === 5) ? true : false;
-  this.isEnd = (row === 8 && col === 1) ? true : false;
+  this.id = `${row}-${col}`;
+  this.isStart = (row === 9 && col === 15) ? true : false;
+  this.isEnd = (row === 0 && col === 0) ? true : false;
   this.dist = Infinity;
   this.isVisited = false;
 }
@@ -12,8 +12,8 @@ export default class Board {
   constructor() {
     this.startNode = null;
     this.endNode = null;
-    this.rows = 10;
-    this.cols = 10;
+    this.rows = 15;
+    this.cols = 30;
   }
 
   init() {

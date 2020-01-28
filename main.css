@@ -8,8 +8,8 @@ body {
 
 .board__container {
   display: grid;
-  grid-template-rows: repeat(10, auto);
-  grid-template-columns: repeat(10, auto);
+  grid-template-rows: repeat(15, auto);
+  grid-template-columns: repeat(30, auto);
 }
 
 .cell {
@@ -17,15 +17,16 @@ body {
   margin: .5px;
   height: 30px;
   width: 30px;
-  border: 1px solid black;
+  border: 1px solid rgb(247, 246, 246);
+  border-radius: 5px;
 }
 
 .cell--picked {
-  background-color: yellow;
+  animation: cellpath 500ms ease both;
 }
 
 .cell--shortest {
-  background-color: teal;
+  animation: cellshortest 500ms ease both;
 }
 
 .cell--start {
@@ -34,4 +35,32 @@ body {
 
 .cell--end {
   background-color: lightcoral;
+}
+
+@keyframes cellpath {
+  0% {
+    background-color: rgb(158, 186, 248);
+  }
+
+  90% {
+    background-color: rgb(60, 173, 201);
+  }
+
+  100% {
+    background-color: rgb(152, 250, 234);
+  }
+}
+
+@keyframes cellshortest {
+  0% {
+    background-color: rgb(250, 127, 209);
+  }
+
+  80% {
+    background-color: rgb(185, 252, 109);
+  }
+
+  100% {
+    background-color: rgb(226, 253, 182);
+  }
 }

@@ -20,13 +20,14 @@ const setupBoard = () => {
 }
 
 const controlDijkstra = () => {
-
   const visitedNodesInOrder = dijkstra(state.board.allNodes, state.board.startNode, state.board.endNode);
   visitedNodesInOrder.forEach((node, index) => {
     const id = node.id
     setTimeout(() => {
-      state.board.setClassListByID(id, 'cell--picked')
-    }, index * 20);
+      if (state.board.startNode !== node && state.board.endNode !== node) {
+        state.board.setClassListByID(id, 'cell--picked')
+      }
+    }, index * 10);
   })
 
   setTimeout(() => {
@@ -34,13 +35,14 @@ const controlDijkstra = () => {
     nodesInShortestPath.forEach((node, index) => {
       const id = node.id
       setTimeout(() => {
-        state.board.setClassListByID(id, 'cell--shortest')
-      }, index * 10);
+        if (state.board.startNode !== node && state.board.endNode !== node) {
+          state.board.setClassListByID(id, 'cell--shortest')
+        }
+      }, index * 5);
     })
-  }, visitedNodesInOrder.length * 20);
-
-  console.log(state.board.allNodes);
+  }, visitedNodesInOrder.length * 10);
 }
+
 
 
 
