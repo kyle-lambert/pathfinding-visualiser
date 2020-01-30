@@ -1,13 +1,15 @@
 import Grid from './components/Grid.js'
-import {
-  dijkstra,
-  getShortestPath
-} from './algorithms/dijkstra.js';
+// import {
+//   dijkstra,
+//   getShortestPath
+// } from './algorithms/Dijkstra.js';
+import Dijkstra from './algorithms/Dijkstra.js'
 
 
 class Controller {
   constructor() {
     this.grid = new Grid();
+    this.isDijkstra = true;
   }
 
   init() {
@@ -18,12 +20,20 @@ class Controller {
 
   setupEventListeners() {
     document.querySelector('.start__button').addEventListener('click', () => {
-      const nodesVisited = dijkstra(this.grid.nodes, this.grid.startNode, this.grid.targetNode);
-      const shortestPath = getShortestPath(this.grid.targetNode);
-      this.grid.setNodesVisited(nodesVisited);
-      this.grid.setShortestPath(shortestPath);
-      this.grid.animateVisitedNodes();
-      this.grid.animateShortestPath();
+      if (this.isDijkstra) {
+        const dijkstra = new Dijkstra();
+        dijkstra.runDijkstra(this.grid.nodes, this.grid.startNode, this.grid.targetNode);
+        const nodesVisited = dijkstra.visitedNodeInOrder;
+        console.log(nodesVisited);
+        this.grid.setNodesVisited(nodesVisited);
+        this.grid.animateVisitedNodes();
+
+      }
+
+      // const nodesVisited = dijkstra(this.grid.nodes, this.grid.startNode, this.grid.targetNode);
+      // const shortestPath = getShortestPath(this.grid.targetNode);
+      // this.grid.setShortestPath(shortestPath);
+      // this.grid.animateShortestPath();
     })
   }
 }
@@ -31,4 +41,4 @@ class Controller {
 const controller = new Controller();
 controller.init();
 
-console.log(controller);
+// console.log(controller);

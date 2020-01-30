@@ -21,20 +21,9 @@ export default class Grid {
   }
 
   initialiseGrid() {
-    this.createGrid();
+    this._createGrid();
     this._setInitialStartNode();
     this._setInitialTargetNode();
-  }
-
-  createGrid() {
-    const nodes = new Array(this.rows);
-    for (let r = 0; r < this.rows; r++) {
-      nodes[r] = new Array(this.cols)
-      for (let c = 0; c < this.cols; c++) {
-        nodes[r][c] = new Node(r, c);
-      }
-    }
-    this.nodes = nodes;
   }
 
   // view
@@ -48,7 +37,7 @@ export default class Grid {
     })
   }
 
-  animateShortestPath = () => {
+  animateShortestPath() {
     setTimeout(() => {
       this.shortestPath.forEach((node, i) => {
         const id = node.id;
@@ -75,6 +64,17 @@ export default class Grid {
   }
 
   // private
+  _createGrid() {
+    const nodes = new Array(this.rows);
+    for (let r = 0; r < this.rows; r++) {
+      nodes[r] = new Array(this.cols)
+      for (let c = 0; c < this.cols; c++) {
+        nodes[r][c] = new Node(r, c);
+      }
+    }
+    this.nodes = nodes;
+  }
+
   _setInitialStartNode() {
     const row = Math.floor((this.rows - 1) / 2);
     const col = Math.floor(2);
