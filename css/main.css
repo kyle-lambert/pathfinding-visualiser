@@ -40,3 +40,7 @@ body {
 .tile--target {
   background-color: lightcoral;
 }
+
+.tile--wall {
+  background-color: darkslateblue;
+}

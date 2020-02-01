@@ -5,5 +5,8 @@ export default class Node {
     this.id = `${row}-${col}`;
     this.distance = Infinity;
     this.isVisited = false;
+    this.isStart = false;
+    this.isTarget = false;
+    this.isWall = false;
   }
 }

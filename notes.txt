@@ -1,0 +1,22 @@
+
+pathfinding visualiser
+
+algorithm type
+  - dijkstra
+  - astar
+  - greedy
+
+animation speed
+  - fast
+  - medium
+  - slow
+
+buttons
+  - clear grid
+  - start/run algorithm
+
+
+gridModel
+data = rows, cols, start, target, walls, 
+
+gridView
