@@ -5,6 +5,7 @@ export default class Grid {
     this.rows = rows;
     this.cols = cols;
     this.walls = [];
+
   }
 
   setInititalGrid() {
@@ -38,13 +39,22 @@ export default class Grid {
     return this.grid.reduce((acc, cur) => acc.concat(cur)).find(cur => cur.id === id)
   }
 
-  isStartNode(id) {
-    const node = this._findNodeByID(id);
+  // isStartNode(id) {
+  //   const node = this._findNodeByID(id);
+  //   return this.startNode === node ? true : false;
+  // }
+
+  // isTargetNode(id) {
+  //   const node = this._findNodeByID(id);
+  //   return this.targetNode === node ? true : false;
+  // }
+  isStartNode(row, col) {
+    const node = this.grid[row][col];
     return this.startNode === node ? true : false;
   }
 
-  isTargetNode(id) {
-    const node = this._findNodeByID(id);
+  isTargetNode(row, col) {
+    const node = this.grid[row][col];
     return this.targetNode === node ? true : false;
   }
 
