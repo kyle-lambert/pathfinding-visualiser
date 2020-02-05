@@ -20,3 +20,10 @@ export const displayGrid = grid => {
 export const clearGrid = () => {
   document.querySelector('.grid__container').innerHTML = '';
 }
+
+// todo: separate this into two seperate functions
+// one for animating visited nodes and other for animating shortest path
+export const animateNode = (node, classname) => {
+  const id = `${node.row}-${node.col}`;
+  document.getElementById(id).classList.add(classname)
+}

@@ -5,7 +5,8 @@ export default class Grid {
     this.rows = rows;
     this.cols = cols;
     this.walls = [];
-
+    this.isAnimating = false;
+    this.animationSpeed = 100 // ms
   }
 
   setInititalGrid() {
@@ -35,19 +36,10 @@ export default class Grid {
     this.targetNode = target;
   }
 
-  _findNodeByID(id) {
-    return this.grid.reduce((acc, cur) => acc.concat(cur)).find(cur => cur.id === id)
+  toggleIsAnimating() {
+    this.isAnimating = !this.isAnimating;
   }
 
-  // isStartNode(id) {
-  //   const node = this._findNodeByID(id);
-  //   return this.startNode === node ? true : false;
-  // }
-
-  // isTargetNode(id) {
-  //   const node = this._findNodeByID(id);
-  //   return this.targetNode === node ? true : false;
-  // }
   isStartNode(row, col) {
     const node = this.grid[row][col];
     return this.startNode === node ? true : false;
@@ -63,22 +55,9 @@ export default class Grid {
     return node.isWall ? true : false;
   }
 
-  // addWall(id) {
-  //   const node = this._findNodeByID(id);
-  //   node.isWall = !node.isWall;
-
-  //   this.walls.push(node);
-  //   return node
-  // }
-
-  // removeWall(id) {
-  //   const node = this._findNodeByID(id);
-  //   node.isWall = !node.isWall;
-
-  //   const index = this.walls.findIndex(el => el.id === id);
-  //   this.walls.splice(index, 1);
-  //   return node
-  // }
+  getAnimationSpeed() {
+    return this.animationSpeed;
+  }
 
   addWall(row, col) {
     const node = this.grid[row][col];

@@ -1,67 +1,67 @@
-export default class Dijkstra {
-  constructor() {
-    this.unvisitedNodes = null;
-    this.visitedNodeInOrder = [];
+export const getShortestPath = target => {
+  const nodesInShortestPathOrder = [];
+  let currentNode = target;
+
+  while (currentNode) {
+    nodesInShortestPathOrder.unshift(currentNode);
+    currentNode = currentNode.previousNode;
   }
+  return nodesInShortestPathOrder;
+}
 
-  runDijkstra(nodes, start, target) {
-    this.unvisitedNodes = this._flattenArray(nodes);
-    start.distance = 0;
-    let closestNode = start
 
-    while (this.unvisitedNodes.length > 0) {
-      this._sortNodesByDistance();
-      closestNode = this.unvisitedNodes.shift();
-      if (closestNode === target) return this.visitedNodeInOrder;
-      // if (this.closestNode === wall) {
-      //   // code to handle grid walls
-      // }
-      this._updateUnvisitedNeighbors(closestNode, nodes);
-      closestNode.isVisited = true
-      this.visitedNodeInOrder.push(closestNode);
-    }
+export const visitedNodesInOrder = (grid, start, target, walls) => {
+  if (!start || !target || !grid) return;
+  const unvisitedNodes = grid.reduce((acc, cur) => acc.concat(cur));
+  const visitedNodes = [];
+
+  // always start at node with the smallest distance
+  start.distance = 0;
+
+  let currentNode = start;
+
+  while (unvisitedNodes.length > 0) {
+
+    sortNodesByDistance(unvisitedNodes);
+
+    currentNode = unvisitedNodes.shift();
+
+    if (currentNode.isWall) continue;
+    if (currentNode === target) return visitedNodes;
+    // no possible path
+    if (currentNode.distance === Infinity) return visitedNodes;
+
+    updateUnvisitedNeighbors(grid, currentNode);
+    currentNode.isVisited = true
+    visitedNodes.push(currentNode);
   }
+  return visitedNodes;
+}
 
-  getShortestPath(target) {
-    const nodesInShortestPathOrder = [];
-    let currentNode = target;
+const updateUnvisitedNeighbors = (grid, current) => {
+  const neighbors = getClosestNeighbors(grid, current);
+  neighbors.forEach(n => {
+    n.distance = current.distance + 1;
+    n.previousNode = current;
+  })
+}
 
-    while (currentNode) {
-      nodesInShortestPathOrder.unshift(currentNode);
-      currentNode = currentNode.previousNode;
-    }
-    return nodesInShortestPathOrder;
-  }
+const getClosestNeighbors = (grid, current) => {
+  const {
+    row,
+    col
+  } = current;
 
-  // private
-  _updateUnvisitedNeighbors(closest, nodes) {
-    const unvisitedNeighbors = this._getUnvisitedNeighbors(closest, nodes);
-    unvisitedNeighbors.forEach(neighbor => {
-      neighbor.distance = closest.distance + 1
-      neighbor.previousNode = closest;
-    })
-  }
+  const neighbors = [];
 
-  _getUnvisitedNeighbors(closest, nodes) {
-    const neighbors = [];
-    const {
-      row,
-      col
-    } = closest;
+  if (row > 0) neighbors.push(grid[row - 1][col]);
+  if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
+  if (col > 0) neighbors.push(grid[row][col - 1]);
+  if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
 
-    if (row > 0) neighbors.push(nodes[row - 1][col]);
-    if (row < nodes.length - 1) neighbors.push(nodes[row + 1][col])
-    if (col > 0) neighbors.push(nodes[row][col - 1]);
-    if (col < nodes[0].length - 1) neighbors.push(nodes[row][col + 1])
+  return neighbors.filter(n => !n.isVisited);
+}
 
-    return neighbors.filter(n => !n.isVisited);
-  }
-
-  _sortNodesByDistance() {
-    this.unvisitedNodes.sort((a, b) => a.distance - b.distance);
-  }
-
-  _flattenArray(nodes) {
-    return nodes.reduce((total, node) => total.concat(node));
-  }
+const sortNodesByDistance = (nodes) => {
+  return nodes.sort((a, b) => a.distance - b.distance);
 }
