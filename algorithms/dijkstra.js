@@ -10,7 +10,7 @@ export const getShortestPath = target => {
 }
 
 
-export const visitedNodesInOrder = (grid, start, target, walls) => {
+export const visitedNodesInOrder = (grid, start, target) => {
   if (!start || !target || !grid) return;
   const unvisitedNodes = grid.reduce((acc, cur) => acc.concat(cur));
   const visitedNodes = [];
@@ -32,7 +32,7 @@ export const visitedNodesInOrder = (grid, start, target, walls) => {
     if (currentNode.distance === Infinity) return visitedNodes;
 
     updateUnvisitedNeighbors(grid, currentNode);
-    currentNode.isVisited = true
+    currentNode.isVisited = true;
     visitedNodes.push(currentNode);
   }
   return visitedNodes;

@@ -22,6 +22,7 @@ const controlGrid = () => {
 
   // render new grid
   gridView.displayGrid(state.grid.grid);
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,8 +39,56 @@ const handleWallDraw = tile => {
   if (!tile.className.includes('tile--start') && !tile.className.includes('tile--target')) {
     tile.classList.add('tile--wall');
     state.grid.addWall(row, col);
+    // state.grid.addWall(row, col);
   }
 };
+
+// const handleClearGrid = () => {
+//   state.grid.resetWalls();
+//   const tiles = document.querySelectorAll('.tile');
+//   tiles.forEach(tile => {
+//     const {
+//       row,
+//       col
+//     } = tile.dataset;
+
+//   })
+//   state.grid.resetWalls();
+// }
+
+
+const controlDijkstra = () => {
+  const visitedNodes = dijkstra.visitedNodesInOrder(state.grid.grid, state.grid.startNode, state.grid.targetNode);
+  const shortestPath = dijkstra.getShortestPath(state.grid.targetNode);
+  const animationSpeed = state.grid.animationSpeed;
+
+  // algo started
+  state.grid.setAlgoRunning(true);
+  console.log(state.grid.algoRunning);
+
+  visitedNodes.forEach((node, i) => {
+    setTimeout(() => {
+      gridView.animateVisitedNode(node);
+      if (i === visitedNodes.length - 1) {
+        timeout();
+      }
+    }, animationSpeed * i);
+
+    const timeout = () => {
+      shortestPath.forEach((node, i) => {
+        setTimeout(() => {
+          gridView.animateShortestPathNode(node);
+
+          if (i === shortestPath.length - 1) {
+            // algo finished
+            state.grid.setAlgoRunning(false);
+            console.log(state.grid.algoRunning);
+          }
+        }, animationSpeed * i);
+      })
+    }
+  })
+}
 
 const setupEventListeners = () => {
   document.querySelectorAll('.tile').forEach(tile => {
@@ -57,32 +106,16 @@ const setupEventListeners = () => {
   })
 
   document.querySelector('.start__button').addEventListener('click', () => {
-    const visitedNodes = dijkstra.visitedNodesInOrder(state.grid.grid, state.grid.startNode, state.grid.targetNode, state.grid.walls);
-    const shortestPath = dijkstra.getShortestPath(state.grid.targetNode);
-
-    // clean up this messy code
-    // extract into one or two functions and import from gridView.js
-    visitedNodes.forEach((node, i) => {
-      setTimeout(() => {
-        gridView.animateNode(node, 'tile--visited');
-        if (i === visitedNodes.length - 1) {
-          timeout();
-          // toggle is animating property here
-        }
-      }, 30 * i);
-
-      const timeout = () => {
-        shortestPath.forEach((node, i) => {
-          setTimeout(() => {
-
-            gridView.animateNode(node, 'tile--path');
-            // toggle is animating property here
-
-          }, 30 * i);
-        })
-      }
-    })
-
-    console.log(shortestPath);
+    if (!state.grid.algoRunning) {
+      console.log('fdsfsdfs');
+      controlDijkstra();
+    }
   })
+
+
+  // document.querySelector('.clear-grid__button').addEventListener('click', () => {
+  //   if (!state.grid.algoRunning) {
+  //     handleClearGrid();
+  //   }
+  // })
 }

@@ -4,9 +4,8 @@ export default class Grid {
   constructor(rows, cols) {
     this.rows = rows;
     this.cols = cols;
-    this.walls = [];
-    this.isAnimating = false;
-    this.animationSpeed = 100 // ms
+    this.algoRunning = false;
+    this.animationSpeed = 10; // ms
   }
 
   setInititalGrid() {
@@ -36,8 +35,8 @@ export default class Grid {
     this.targetNode = target;
   }
 
-  toggleIsAnimating() {
-    this.isAnimating = !this.isAnimating;
+  setAlgoRunning(bool) {
+    this.algoRunning = bool;
   }
 
   isStartNode(row, col) {
@@ -55,24 +54,19 @@ export default class Grid {
     return node.isWall ? true : false;
   }
 
-  getAnimationSpeed() {
-    return this.animationSpeed;
-  }
-
   addWall(row, col) {
     const node = this.grid[row][col];
-    node.isWall = !node.isWall;
+    node.isWall = true;
 
-    this.walls.push(node);
     return node
   }
 
-  removeWall(row, col) {
-    const node = this.grid[row][col];
-    node.isWall = !node.isWall;
+  // removeWall(row, col) {
+  //   const node = this.grid[row][col];
+  //   node.isWall = !node.isWall;
 
-    const index = this.walls.findIndex(cur => cur.row === row && cur.col === col);
-    this.walls.splice(index, 1);
-    return node
-  }
+  //   // const index = this.walls.findIndex(cur => cur.row === row && cur.col === col);
+  //   // this.walls.splice(index, 1);
+  //   return node
+  // }
 }

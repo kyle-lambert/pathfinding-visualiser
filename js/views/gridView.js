@@ -23,7 +23,19 @@ export const clearGrid = () => {
 
 // todo: separate this into two seperate functions
 // one for animating visited nodes and other for animating shortest path
-export const animateNode = (node, classname) => {
+
+export const animateVisitedNode = (node) => {
   const id = `${node.row}-${node.col}`;
-  document.getElementById(id).classList.add(classname)
+  document.getElementById(id).classList.add('tile--visited');
+}
+
+export const animateShortestPathNode = (node) => {
+  const id = `${node.row}-${node.col}`;
+  const tile = document.getElementById(id);
+
+  if (tile.className.includes('tile--visited')) {
+    tile.classList.remove('tile--visited');
+  }
+
+  tile.classList.add('tile--path');
 }
