@@ -1,7 +1,8 @@
 export const displayGrid = grid => {
+  clearGrid();
+
   const flat = grid.reduce((acc, cur) => acc.concat(cur));
   flat.forEach(node => {
-    // generate tile with attributes
     const tile = document.createElement('div');
     tile.id = node.id;
     tile.classList.add('tile');
@@ -12,7 +13,6 @@ export const displayGrid = grid => {
     if (node.isTarget) tile.classList.add('tile--target')
     if (node.isWall) tile.classList.add('tile--wall');
 
-    // append tile to grid
     document.querySelector('.grid__container').appendChild(tile);
   })
 }
@@ -33,9 +33,10 @@ export const animateShortestPathNode = (node) => {
   const id = `${node.row}-${node.col}`;
   const tile = document.getElementById(id);
 
-  if (tile.className.includes('tile--visited')) {
+  if (node.isVisited) {
     tile.classList.remove('tile--visited');
   }
-
-  tile.classList.add('tile--path');
+  if (!node.isStart && !node.isTarget) {
+    tile.classList.add('tile--path');
+  }
 }

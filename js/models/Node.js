@@ -8,5 +8,6 @@ export default class Node {
     this.isStart = false;
     this.isTarget = false;
     this.isWall = false;
+    this.previousNode = null;
   }
 }

@@ -2,10 +2,13 @@ export const getShortestPath = target => {
   const nodesInShortestPathOrder = [];
   let currentNode = target;
 
-  while (currentNode) {
-    nodesInShortestPathOrder.unshift(currentNode);
-    currentNode = currentNode.previousNode;
+  if (currentNode.previousNode) {
+    while (currentNode) {
+      nodesInShortestPathOrder.unshift(currentNode);
+      currentNode = currentNode.previousNode;
+    }
   }
+
   return nodesInShortestPathOrder;
 }
 
